@@ -1,24 +1,16 @@
-import os
-import asyncio
-import json
-import re
-import discord
-import aiohttp
+import os, asyncio, json, re, discord, aiohttp, uvicorn
 from bs4 import BeautifulSoup
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-import uvicorn
 
-# --- CONFIGURATION ---
-TOKEN = os.getenv("DISCORD_TOKEN") # Récupère le token sur Render
+# --- CONFIG ---
+TOKEN = os.getenv("DISCORD_TOKEN")
 SALONS_A_SURVEILLER = [1492568836787142706, 1492086204303413248, 1492088431524843601, 1492089160503132281, 1492485336474058835]
 SEUIL_BENEF = 40
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
-
-# --- PARTIE BOT DISCORD ---
 intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents=intents)
@@ -47,7 +39,7 @@ async def analyser_lien(url):
 async def traiter_message(message):
     contenu = message.content
     for e in message.embeds:
-        contenu += f" {e.description} {e.title} {e.url}"
+        contenu += f" {e.description or ''} {e.title or ''} {e.url or ''}"
     urls = re.findall(r'(https?://(?:www\.)?dealabs\.com/[^\s"\'<>]+)', contenu)
     for url in list(set(urls)):
         titre, prix, benef = await analyser_lien(url)
@@ -61,16 +53,22 @@ async def traiter_message(message):
                 with open('deals.json', 'w', encoding='utf-8') as f: json.dump(data[:50], f, ensure_ascii=False)
 
 @client.event
-async def on_ready(): print(f"🤖 Bot connecté et prêt !")
+async def on_ready():
+    print(f"🤖 Bot connecté. Scan de l'historique...")
+    for s_id in SALONS_A_SURVEILLER:
+        salon = client.get_channel(s_id)
+        if salon:
+            async for msg in salon.history(limit=50):
+                await traiter_message(msg)
+    print("✅ Scan terminé !")
 
 @client.event
 async def on_message(msg):
     if msg.channel.id in SALONS_A_SURVEILLER: await traiter_message(msg)
 
-# --- PARTIE SITE WEB ---
 @app.on_event("startup")
 async def startup_event():
-    asyncio.create_task(client.start(TOKEN)) # Lance le bot en arrière-plan
+    asyncio.create_task(client.start(TOKEN))
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
