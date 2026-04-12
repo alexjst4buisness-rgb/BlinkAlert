@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Blink Alert - Dashboard</title>
+</head>
+<body class="bg-gray-900 text-white font-sans">
+    <nav class="flex justify-between items-center p-6 bg-gray-800 border-b border-blue-500 shadow-lg">
+        <h1 class="text-3xl font-black text-blue-400 italic">BLINK ALERT</h1>
+        <a href="{{ discord_link }}" class="bg-blue-600 px-6 py-2 rounded-full font-bold hover:bg-blue-700 transition">DISCORD</a>
+    </nav>
+
+    <div class="flex container mx-auto mt-10 p-4 gap-8">
+        <div class="flex-1">
+            <h2 class="text-2xl font-bold mb-8 text-gray-100 flex items-center">
+                <span class="bg-orange-500 w-2 h-8 mr-3 rounded-full"></span>
+                Pépites Détectées (>40€ bénéfice)
+            </h2>
+            
+            <div class="grid grid-cols-1 gap-6">
+                {% if not deals %}
+                <p class="text-gray-500 italic text-center py-20">Aucune offre de +40€ trouvée pour le moment...</p>
+                {% endif %}
+
+                {% for deal in deals %}
+                <div>
+                    <div class="mb-1 text-xs font-black text-blue-500 uppercase tracking-widest">{{ deal.cat }}</div>
+                    <div class="bg-gray-800 p-5 rounded-2xl border border-gray-700 hover:border-blue-500 transition-all shadow-xl group">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold text-xl text-gray-100 group-hover:text-blue-400 transition">{{ deal.produit }}</h3>
+                            <a href="{{ deal.lien }}" target="_blank" class="bg-gray-700 p-2 rounded-lg hover:bg-blue-600 transition">➡️</a>
+                        </div>
+                        <div class="flex gap-6 mt-4">
+                            <div class="bg-gray-900 px-4 py-2 rounded-lg border border-gray-700">
+                                <span class="text-gray-400 text-xs block">PRIX ACTUEL</span>
+                                <span class="text-green-400 font-black text-lg">{{ deal.prix }}</span>
+                            </div>
+                            <div class="bg-gray-900 px-4 py-2 rounded-lg border border-gray-700">
+                                <span class="text-gray-400 text-xs block">BÉNÉFICE</span>
+                                <span class="text-orange-400 font-black text-lg">+{{ deal.benef }}€</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="hidden xl:block w-80">
+            <h2 class="text-xl font-bold mb-6">💬 Live Community</h2>
+            <iframe src="https://discord.com/widget?id=1492568836787142706&theme=dark" width="350" height="600" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+        </div>
+    </div>
+</body>
+</html>

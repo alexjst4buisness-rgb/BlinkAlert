@@ -1,0 +1,5 @@
+[
+    {"produit": "LEGO Star Wars Venator", "prix": "450€", "benef": 120, "cat": "Lego", "lien": "#"},
+    {"produit": "Air Jordan 1 Retro", "prix": "180€", "benef": 75, "cat": "Chaussures", "lien": "#"},
+    {"produit": "Veste Nike Tech Fleece", "prix": "60€", "benef": 20, "cat": "Vêtements", "lien": "#"}
+]
