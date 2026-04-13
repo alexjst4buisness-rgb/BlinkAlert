@@ -79,6 +79,5 @@ async def home(request: Request):
     try:
         with open('deals.json', 'r', encoding='utf-8') as f: deals = json.load(f)
     except: deals = []
-    return templates.TemplateResponse("index.html", {"request": request, "deals": deals})
-
+    return templates.TemplateResponse(request, "index.html", {"request": request, "deals": deals})
 if __name__ == "__main__": uvicorn.run(app, host="0.0.0.0", port=8000)
